@@ -39,4 +39,7 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<class UStudent> StudentSrc;
+
+	UPROPERTY()
+	TObjectPtr<class UProgrammer> ProgrammerData;
 };

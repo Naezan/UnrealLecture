@@ -1,0 +1,22 @@
+{
+    "Programmer" : {
+        "Name" : "Naezan",
+        "Years" : 900,
+        "Career" : 400,
+
+        "Skills" : [
+            {
+                "Name" : "C#",
+                "Career" : 99
+            },
+            {
+                "Name" : "C++",
+                "Career" : 346
+            },
+            {
+                "Name" : "UnrealEngine",
+                "Career" : 20
+            }
+        ]
+    }
+}

@@ -4,6 +4,7 @@
 #include "MyGameInstance.h"
 #include "Student.h"
 #include "JsonObjectConverter.h"
+#include "Programmer.h"
 
 void PrintStudentInfo(const UStudent* InStudent, const FString& InTag)
 {
@@ -97,7 +98,7 @@ void UMyGameInstance::Init()
 		TSharedRef<FJsonObject> JsonObjectSrc = MakeShared<FJsonObject>();
 		//Object를 Json 형식으로 만들어서 JsonObjectSrc에 넣어준다.
 		FJsonObjectConverter::UStructToJsonObject(StudentSrc.GetClass(), StudentSrc, JsonObjectSrc);
-		
+
 		FString JsonOutString;
 		//JsonArchive생성
 		TSharedRef<TJsonWriter<TCHAR>> JsonWriterAr = TJsonWriterFactory<TCHAR>::Create(&JsonOutString);
@@ -113,7 +114,7 @@ void UMyGameInstance::Init()
 
 		//JsonArchive생성
 		TSharedRef<TJsonReader<TCHAR>> JsonReaderAr = TJsonReaderFactory<TCHAR>::Create(JsonInString);
-		
+
 		//JsonObjectDest에 Json데이터를 로드
 		TSharedPtr<FJsonObject> JsonObjectDest;
 		if (FJsonSerializer::Deserialize(JsonReaderAr, JsonObjectDest))
@@ -125,5 +126,40 @@ void UMyGameInstance::Init()
 				PrintStudentInfo(JsonStudentObject, TEXT("JsonData"));
 			}
 		}
+	}
+
+	//프로그래머 데이터 객체를 생성합니다.
+	ProgrammerData = NewObject<UProgrammer>();
+	ProgrammerData->ProgrammerCareer;
+
+	//절대 경로를 생성합니다.
+	FString JsonFileDir(TEXT("ProgrammerData.json"));
+	FString JsonFileAbsolutePath = FPaths::Combine(*SavedDir, *JsonFileDir);
+	FPaths::MakeStandardFilename(JsonFileAbsolutePath);
+
+	FString JsonString;
+	FFileHelper::LoadFileToString(JsonString, *JsonFileAbsolutePath);
+
+	//JsonArchive생성
+	TSharedRef<TJsonReader<TCHAR>> JsonReaderArchive = TJsonReaderFactory<TCHAR>::Create(JsonString);
+
+	//JsonObjectDest에 Json데이터를 로드
+	TSharedPtr<FJsonObject> JsonObject;
+	if (FJsonSerializer::Deserialize(JsonReaderArchive, JsonObject))
+	{
+		auto Programmer = JsonObject->GetObjectField(TEXT("Programmer"));
+		ProgrammerData->ProgrammerCareer.Name = Programmer->GetStringField(TEXT("Name"));
+		ProgrammerData->ProgrammerCareer.Years = Programmer->GetIntegerField(TEXT("Years"));
+		ProgrammerData->ProgrammerCareer.Career = Programmer->GetIntegerField(TEXT("Career"));
+
+		for (const auto& Skill : Programmer->GetArrayField(TEXT("Skills")))
+		{
+			ProgrammerData->ProgrammerCareer.Skills.Emplace(
+				Skill->AsObject()->GetStringField(TEXT("Name")),
+				Skill->AsObject()->GetIntegerField(TEXT("Career"))
+			);
+		}
+
+		ProgrammerData->PrintProgrammerData();
 	}
 }
